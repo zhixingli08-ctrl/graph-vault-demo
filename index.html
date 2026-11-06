@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>图谱金库 Graph Vault · 演示</title>
+  <meta name="description" content="买卖税织成一张活图；你的节点越亮，分得越多。Flap 金库三池小生态演示。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="demo-banner">演示／模拟 · 非主网 · 数据为本地假账 · 可点击体验三池分税与 Agent 协作网</div>
+
+  <div class="shell">
+    <header class="header">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>图谱金库 <span>GRAPH VAULT</span></h1>
+          <p class="tagline">买卖税织成一张活图；你的节点越亮，分得越多。</p>
+        </div>
+      </div>
+      <div class="epoch-pill">
+        <span>当前纪元</span>
+        <strong id="epochLabel">E-0001</strong>
+        <span class="quiet-badge" id="quietBadge">网络休眠</span>
+      </div>
+    </header>
+
+    <section class="stats" aria-label="看板四格">
+      <div class="stat cyan">
+        <div class="label">活跃节点</div>
+        <div class="value" id="statNodes">0</div>
+      </div>
+      <div class="stat violet">
+        <div class="label">活跃边</div>
+        <div class="value" id="statEdges">0</div>
+      </div>
+      <div class="stat amber">
+        <div class="label">本轮税入</div>
+        <div class="value" id="statPot">0.00<em>BNB</em></div>
+      </div>
+      <div class="stat green">
+        <div class="label">距结算</div>
+        <div class="value" id="statCountdown">05:59</div>
+      </div>
+    </section>
+
+    <section class="pools" aria-label="三池">
+      <div class="pool n" id="poolN">
+        <div class="pool-head"><span class="name">亮度池</span><span class="pct">60%</span></div>
+        <div class="pool-amt" id="poolNAmt">0.000 <span>BNB</span></div>
+        <div class="bar"><i id="poolNBar" style="width:60%"></i></div>
+      </div>
+      <div class="pool s" id="poolS">
+        <div class="pool-head"><span class="name">突触池</span><span class="pct">25%</span></div>
+        <div class="pool-amt" id="poolSAmt">0.000 <span>BNB</span></div>
+        <div class="bar"><i id="poolSBar" style="width:25%"></i></div>
+      </div>
+      <div class="pool i" id="poolI">
+        <div class="pool-head"><span class="name">点火池</span><span class="pct">15%</span></div>
+        <div class="pool-amt" id="poolIAmt">0.000 <span>BNB</span></div>
+        <div class="bar"><i id="poolIBar" style="width:15%"></i></div>
+      </div>
+    </section>
+
+    <div class="quiet-banner" id="quietBanner">网络休眠 · 全图有效亮度低于静默线（1 BNB）· 本轮税将整笔滚入下一纪元</div>
+
+    <div class="main">
+      <div class="panel">
+        <div class="panel-hd">
+          <strong>活图 · Living Graph</strong>
+          <span id="graphMeta">事件驱动 · 演示渲染</span>
+        </div>
+        <canvas id="graph" width="760" height="420"></canvas>
+      </div>
+
+      <div class="side">
+        <div class="panel wallet-card">
+          <div class="wallet-row">
+            <span class="addr" id="myAddr">0xYOU…demo</span>
+            <label class="agent-toggle" title="演示开关：有 Agent ID 时亮度写入 +20%">
+              <span>我有 Agent ID</span>
+              <input type="checkbox" id="agentToggle" />
+              <span class="switch"></span>
+            </label>
+          </div>
+
+          <div class="metrics">
+            <div class="metric"><div class="k">我的亮度（下纪元）</div><div class="v" id="myLum">0.000</div></div>
+            <div class="metric"><div class="k">突触权重</div><div class="v" id="mySyn">0.000</div></div>
+            <div class="metric"><div class="k">点火待分</div><div class="v" id="myIgn">—</div></div>
+            <div class="metric"><div class="k">可领</div><div class="v claim" id="myClaim">0.000 BNB</div></div>
+          </div>
+
+          <div class="buy-row">
+            <input type="number" id="buyAmt" min="0.05" max="5" step="0.01" value="0.10" />
+            <button class="btn btn-primary" id="btnBuy">图谱入口买入</button>
+          </div>
+          <p class="hint">门槛 ≥ 0.05 BNB · 单笔记账顶 5 · 冷却 60s（演示缩短）· 本轮买 → 下轮生效</p>
+
+          <button class="btn btn-settle" id="btnSettle">推进到下一结算</button>
+          <button class="btn btn-claim" id="btnClaim">领取可领余额</button>
+        </div>
+
+        <div class="panel instr">
+          <div class="panel-hd" style="padding:0 0 10px;border:0;">
+            <strong>Agent 指令模板</strong>
+            <span>只是模板 · 领钱不看角色</span>
+          </div>
+          <div class="instr-tabs">
+            <button class="tab active" data-role="scout">侦察</button>
+            <button class="tab" data-role="relay">接力</button>
+            <button class="tab" data-role="boost">补光</button>
+          </div>
+          <div class="instr-box" id="instrText"></div>
+          <div class="instr-actions">
+            <button class="btn btn-ghost" id="btnCopy" style="flex:1">复制指令</button>
+            <button class="btn btn-ghost" id="btnRunRole" style="flex:1">按此模板演示买入</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel log-panel">
+      <div class="panel-hd">
+        <strong>图谱日志</strong>
+        <span id="agentShare">本轮 Agent 节点占比 —</span>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <section class="rules" style="margin-top:16px">
+      <div class="rule"><b>01 图谱入口</b>经入口买入点亮节点；Flap 页直买不上图。</div>
+      <div class="rule"><b>02 三池分税</b>亮度 60% · 突触 25% · 点火 15%。静默则整笔滚存。</div>
+      <div class="rule"><b>03 Agent 网</b>指令驱动多钱包放电；边＝突触；可选 +20% 亮度。</div>
+      <div class="rule"><b>04 不锁不烧</b>卖币不扣亮度 · 不卖卡 · 账在链上。</div>
+    </section>
+
+    <footer class="footer">
+      演示非主网 · Flap 普通税币 + VaultPortal · 不锁仓不烧币不卖卡<br />
+      Every tax is a thread. Light your node, share the graph.
+    </footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
